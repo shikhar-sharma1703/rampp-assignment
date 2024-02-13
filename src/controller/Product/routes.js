@@ -64,3 +64,34 @@ exports.deleteProduct = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+// Search for products
+exports.searchProducts = async (req, res) => {
+  try {
+    const { category, minAmount, maxAmount, amount } = req.query;
+    let query = {};
+
+    if (category) {
+      query.category = category;
+    }
+    
+    if (minAmount || maxAmount) {
+      query.amount = {};
+    
+      if (minAmount) {
+        query.amount.$gte = minAmount;
+      }
+    
+      if (maxAmount) {
+        query.amount.$lte = maxAmount;
+      }
+    } else if (amount) {
+      query.amount = amount;
+    }
+
+    const products = await Product.find(query);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
